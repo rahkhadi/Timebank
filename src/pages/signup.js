@@ -38,8 +38,8 @@ const Signup = () => {
 	return (
 		<>
   <Head>
-        <title>PopcornBuddy - Sign Up</title>
-        <meta name="description" content="Sign up to PopcornBuddy." />
+        <title>Timebank - Sign Up</title>
+        <meta name="description" content="Sign up to Timebank." />
       </Head>
 		<div className="max-w-md mx-auto mt-16 p-8 border border-gray-300 rounded-lg bg-white shadow-md">
 			<h1 className="text-3xl font-bold text-center mb-6">Sign Up</h1>
@@ -114,7 +114,7 @@ const Signup = () => {
 
 			<Link href="/login">
 				<p className="w-full mt-3 text-center text-gray-500">
-					Already have a PopcornBuddy account?&nbsp;
+					Already have a Timebank account?&nbsp;
 					<span className="underline-decoration font-medium cursor-pointer hover:text-[#1f2937]">Login</span>
 				</p>
 			</Link>

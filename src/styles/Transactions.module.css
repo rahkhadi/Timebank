@@ -1,0 +1,22 @@
+.transactionsContainer {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.transactionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.transactionTable th,
+.transactionTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.transactionTable th {
+    background-color: #4caf50;
+    color: white;
+}

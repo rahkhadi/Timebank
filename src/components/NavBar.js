@@ -7,9 +7,8 @@ import {
   faUserPlus,
   faEnvelope,
   faSignOutAlt,
-  faHeart,
-  faList,
   faInfoCircle,
+  faHistory,
 } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
@@ -67,7 +66,7 @@ const NavBar = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5001/api/requests/search", {
+      const response = await axios.get("/api/requests/search", {
         params: { query: term },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -123,6 +122,15 @@ const NavBar = () => {
               Create Request
             </span>
           </Link>
+          <Link href="/transactions" passHref>
+            <span
+              className={`${styles.navLink} ${
+                isActive("/transactions") ? styles.activeLink : ""
+              }`}
+            >
+              Transactions
+            </span>
+          </Link>
         </div>
 
         <div className={styles.searchContainer}>
@@ -148,22 +156,15 @@ const NavBar = () => {
         <div className={styles.authLinks}>
           {isLoggedIn ? (
             <>
-              <Link href="/favorites" passHref>
+              
+              <Link href="/transactions" passHref>
                 <span
                   className={`${styles.authLink} ${
-                    isActive("/favorites") ? styles.activeLink : ""
+                    isActive("/transactions") ? styles.activeLink : ""
                   }`}
+                  title="Transactions"
                 >
-                  <FontAwesomeIcon icon={faHeart} title="Favorites" />
-                </span>
-              </Link>
-              <Link href="/watchlist" passHref>
-                <span
-                  className={`${styles.authLink} ${
-                    isActive("/watchlist") ? styles.activeLink : ""
-                  }`}
-                >
-                  <FontAwesomeIcon icon={faList} title="Watchlist" />
+                  <FontAwesomeIcon icon={faHistory} />
                 </span>
               </Link>
               <span

@@ -60,3 +60,23 @@
     margin-bottom: 1rem;
     width: 80%;
 }
+.requestImage {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+.acceptButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.acceptButton:hover {
+    background-color: #218838;
+}
+

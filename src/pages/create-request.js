@@ -16,15 +16,11 @@ const CreateRequest = () => {
         formData.append('title', title);
         formData.append('description', description);
         formData.append('timeCoins', timeCoins);
-        if (image) {
-            formData.append('image', image);
-        }
+        if (image) formData.append('image', image);
 
         try {
             const response = await axios.post('/api/requests/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
             setMessage('Request created successfully!');
             setTitle('');
@@ -32,7 +28,7 @@ const CreateRequest = () => {
             setTimeCoins('');
             setImage(null);
         } catch (error) {
-            console.error('Error creating request:', error.response?.data || error.message);
+            console.error('Error creating request:', error.message);
             setMessage('Failed to create request');
         }
     };
@@ -50,7 +46,7 @@ const CreateRequest = () => {
                     required
                     className={styles.inputField}
                 />
-
+    
                 <label>Description</label>
                 <textarea
                     value={description}
@@ -58,7 +54,7 @@ const CreateRequest = () => {
                     required
                     className={styles.textareaField}
                 />
-
+    
                 <label>TimeCoins</label>
                 <input
                     type="number"
@@ -67,7 +63,7 @@ const CreateRequest = () => {
                     required
                     className={styles.inputField}
                 />
-
+    
                 <label>Upload Image</label>
                 <input
                     type="file"
@@ -75,7 +71,7 @@ const CreateRequest = () => {
                     accept="image/*"
                     className={styles.inputFile}
                 />
-
+    
                 <button type="submit" className={styles.submitButton}>
                     Submit Request
                 </button>
@@ -85,3 +81,6 @@ const CreateRequest = () => {
 };
 
 export default CreateRequest;
+
+
+

@@ -1,31 +1,36 @@
-import connectDB from '@/utils/dbConnect';
-import authMiddleware from '@/utils/authMiddleware';
-import Request from '@/utils/requestModel';
+import dbConnect from '@/utils/dbConnect';
+import Request from '@/utils/requestModels';
 
-// Initialize DB connection
-connectDB();
-
-// Handler for GET requests
 export default async function handler(req, res) {
+    await dbConnect();
 
-    if (req.method !== 'GET') {
-        res.setHeader('Allow', ['GET']);
-        return res.status(405).end(`Method ${req.method} not allowed`);
-    }
+    const { page = 1, limit = 10 } = req.query;
 
-    try {
-        // Fetch all requests from the database
-        const requests = await Request.find();
-        res.status(200).json(requests);
-    } catch (error) {
-        console.error('Error fetching requests:', error);
-        res.status(500).json({ error: 'Failed to fetch requests' });
+    if (req.method === 'GET') {
+        try {
+            const requests = await Request.find()
+                .populate({
+                    path: 'creator',
+                    select: 'firstName lastName email',
+                    options: { strictPopulate: false },
+                })
+                .skip((page - 1) * limit)
+                .limit(parseInt(limit))
+                .sort({ createdAt: -1 });
+
+            const totalRequests = await Request.countDocuments();
+
+            res.status(200).json({
+                requests,
+                currentPage: parseInt(page),
+                totalPages: Math.ceil(totalRequests / limit),
+                totalRequests,
+            });
+        } catch (error) {
+            console.error('Error fetching requests:', error.message);
+            res.status(500).json({ error: 'Failed to fetch requests' });
+        }
+    } else {
+        res.status(405).json({ error: 'Method Not Allowed' });
     }
 }
-
-// Apply auth middleware
-export const config = {
-    api: {
-        middleware: authMiddleware,
-    },
-};

@@ -28,7 +28,7 @@ const ContactPage = () => {
 			<>
   <Head>
         <title>TimeBank - Contact Us</title>
-        <meta name="description" content="Contact PopcornBuddy's Team." />
+        <meta name="description" content="Contact Timebank's Team." />
       </Head>
 			<div className="flex flex-col mt-16 items-center justify-center">
 				<div className="bg-white p-8 rounded-lg shadow-md max-w-md text-center">
