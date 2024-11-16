@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--foreground-rgb: 255, 255, 255;
+		--background-start-rgb: 0, 0, 0;
+		--background-end-rgb: 0, 0, 0;
+	}
+}
+
+body {
+	color: rgb(var(--foreground-rgb));
+	background: #d4d4d5; /* Lighter background for better contrast */
+	font-family: "Inter", sans-serif;
+}
+
+h1,
+label,
+.main-color,
+.form-color,
+.underline-decoration {
+	color: #1f2937;
+}
+
+.btn-submit,
+.btn-add {
+	background-color: #1f2937;
+	color: #fff;
+	transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+	background-color: #136cb2;
+	color: #fff;
+}
+
+.underline-decoration {
+    color: #136cb2;
+    font-style: italic;
+}
+
+.red-important {
+	color: #fff !important;
+	background-color: #ef4444 !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+	.container {
+		width: 100%;
+		padding: 0 15px;
+	}
+
+	.navbarContainer {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.navLinks,
+	.authLinks {
+		justify-content: center;
+		margin-top: 1rem;
+		flex-direction: column;
+	}
+
+	.searchContainer {
+		margin: 1rem 0;
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.searchInput {
+		width: 100%;
+	}
+
+	.btn-submit {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem;
+	}
+
+	.md\:ml-8,
+	.md\:w-1\/3,
+	.md\:w-2\/3 {
+		margin-left: 0 !important;
+		width: 100% !important;
+	}
+
+	.rating {
+		float: none !important;
+		width: 100%;
+		justify-content: center;
+	}
+
+	.starRatingLabel {
+		float: none !important;
+		font-size: 2em !important;
+		text-align: center;
+	}
+}
+
+/* Utility Layer */
+@layer utilities {
+	.text-balance {
+		text-wrap: balance;
+	}
+
+	.img-small {
+		max-width: 30%; /* Adjust percentage to your needs */
+		height: auto;
+	}
+
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+		.img-small {
+			max-width: 50%; /* Images will be full-width on small screens */
+		}
+	}
+}

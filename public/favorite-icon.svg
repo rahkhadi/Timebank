@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+	<title>favorite-icon-svg</title>
+	<defs>
+		<image  width="20" height="20" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAAAXNSR0IB2cksfwAAAMlQTFRFAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Zu5/OAAAAEN0Uk5TAAdXoMz08NBE3f95/uGIPg+Jd3jxTwFTR/3fKCrkSQzjWl/iWNsEa8PaqPjYM4ONhaasA3ovZ0v1MGm47GU2QlBVRhLlbY0AAAEYSURBVHicZZHNS8NAFMTnJTFWRdD6Ua2FaqyfiaIUFHrw4H8uHgp6kiaCxaa22KoFW1GsNSR57m5SFJzDDvtjlveYJUhRopCZ1VUeGVImxDxK4QzFusiBtTDSzL6CC1/TRD0VXKaBMfUq4IoIdTBWgcKJNhWpl2viV9bzqk+l7ppIFtqTA+xIW9Jbedp/yPQXh8CGB7spLTtaJ8ffrB3eA1s3OKpLO2hYZBrmG47vdh/FfGVzQZjAMr2LVGISOr59jb+Sz+Ug7LXGC7mQg0rdYlTPfaRw9mWbO3ki68m5wvy3YmLZE9fyCKeeQ1VUVCGXOAvc8oUqJKzcpoXYtaEqBMgGsW7EIskcafyZlnxe/V+y+g6DE8nrDwkvdBfCS56wAAAAAElFTkSuQmCC"/>
+	</defs>
+	<style>
+	</style>
+	<use id="Hue/Saturation 1" href="#img1" x="2" y="2"/>
+</svg>

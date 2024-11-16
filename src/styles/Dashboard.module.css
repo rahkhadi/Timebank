@@ -1,0 +1,62 @@
+.dashboardContainer {
+    padding: 2rem;
+}
+
+.dashboardHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.dashboardActions {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.createRequestButton {
+    background-color: #0070f3;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.createRequestButton:hover {
+    background-color: #005bb5;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    color: black;
+    margin-bottom: 2rem;
+}
+
+.filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filter select {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.contentSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    width: 80%;
+}

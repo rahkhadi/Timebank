@@ -1,0 +1,15 @@
+.teamCard {
+	transition: transform 0.3s ease-in-out;
+}
+
+.teamCard:hover {
+	transform: scale(1.05); /* Add a slight zoom on hover */
+}
+
+.socialCard {
+	transition: transform 0.3s ease-in-out;
+}
+
+.socialCard:hover {
+	transform: scale(1.3); /* Add a slight zoom on hover */
+}
