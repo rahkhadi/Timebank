@@ -18,7 +18,7 @@ const AboutPage = () => {
 
 				<section className="mb-12">
 					<p className="text-lg text-[#4a5568] mb-6 leading-7">
-						Welcome to <strong><i>TimeBank</i></strong>, a platform dedicated to empowering communities by enabling them to exchange time and skills. 
+						Welcome To <strong><i>TimeBank</i></strong>, a platform dedicated to empowering communities by enabling them to exchange time and skills. 
 						Here at TimeBank, we believe everyone has something valuable to contribute, and our goal is to create a collaborative environment where time is the most valuable currency.
 					</p>
 					<p className="text-lg text-[#4a5568] mb-6 leading-7">
