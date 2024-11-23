@@ -19,7 +19,7 @@ const CreateRequest = () => {
         if (image) formData.append('image', image);
 
         try {
-            const response = await axios.post('/api/requests/create', formData, {
+           await axios.post('/api/requests/create', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             setMessage('Request created successfully!');

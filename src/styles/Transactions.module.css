@@ -1,6 +1,6 @@
 .transactionsContainer {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #a19b9b;
 }
 
 .transactionTable {
@@ -17,6 +17,6 @@
 }
 
 .transactionTable th {
-    background-color: #4caf50;
+    background-color: #7e807e;
     color: white;
 }

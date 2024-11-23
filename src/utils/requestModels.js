@@ -1,20 +1,12 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const RequestSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     timeCoins: { type: Number, required: true },
     imageUrl: { type: String },
-    acceptedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null,
-    },
-    creator: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
-        required: true,
-    },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who created the request
+    acceptedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // User who accepted the request
     createdAt: { type: Date, default: Date.now },
 });
 

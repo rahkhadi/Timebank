@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import NotificationsDropdown from "./NotificationsDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSignInAlt,
@@ -8,53 +9,29 @@ import {
   faEnvelope,
   faSignOutAlt,
   faInfoCircle,
-  faHistory,
+  faBell, // Add bell icon for notifications
 } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext"; // For authentication logic
 import axios from "axios";
 import RequestDropdown from "./RequestDropdown";
 import styles from "../styles/NavBar.module.css";
 
 const NavBar = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, currentUser } = useAuth(); // Auth state and methods
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false); // For toggling notifications dropdown
   const router = useRouter();
 
+  // Handle user logout
   const handleLogout = () => {
-    logout();
-    setShowLogoutConfirm(false);
+    logout(); // Clears auth state and token
+    setShowLogoutConfirm(false); // Close confirmation dialog
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setShowLogoutConfirm(false);
-      }
-      if (event.key === "Enter" && showLogoutConfirm) {
-        handleLogout();
-      }
-    };
-
-    if (showLogoutConfirm) {
-      document.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.removeEventListener("keydown", handleKeyDown);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [showLogoutConfirm]);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setShowLogoutConfirm(false);
-    }
-  }, [isLoggedIn]);
-
+  // Handle search input changes
   const handleSearchChange = async (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -65,7 +42,7 @@ const NavBar = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
       const response = await axios.get("/api/requests/search", {
         params: { query: term },
         headers: {
@@ -79,15 +56,46 @@ const NavBar = () => {
     }
   };
 
+  // Close dropdown when clicked outside
   const closeDropdown = () => {
     setSearchResults([]);
   };
 
+  // Toggle notifications dropdown
+  const handleNotificationsClick = () => {
+    setShowNotifications(!showNotifications); // Open or close dropdown
+  };
+
+  // Determine if a route is active
   const isActive = (pathname) => router.pathname === pathname;
+
+  // Keyboard events for accessibility
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setShowLogoutConfirm(false);
+        setShowNotifications(false); // Close notifications dropdown
+      }
+      if (event.key === "Enter" && showLogoutConfirm) {
+        handleLogout();
+      }
+    };
+
+    if (showLogoutConfirm || showNotifications) {
+      document.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.removeEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showLogoutConfirm, showNotifications]);
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.navbarContainer}>
+        {/* Logo */}
         <div className={styles.logoContainer}>
           <Link href="/" passHref>
             <div className="cursor-pointer flex items-center">
@@ -103,36 +111,42 @@ const NavBar = () => {
           </Link>
         </div>
 
+        {/* Navigation Links */}
         <div className={styles.navLinks}>
-          <Link href="/dashboard" passHref>
-            <span
-              className={`${styles.navLink} ${
-                isActive("/dashboard") ? styles.activeLink : ""
-              }`}
-            >
-              Dashboard
-            </span>
-          </Link>
-          <Link href="/create-request" passHref>
-            <span
-              className={`${styles.navLink} ${
-                isActive("/create-request") ? styles.activeLink : ""
-              }`}
-            >
-              Create Request
-            </span>
-          </Link>
-          <Link href="/transactions" passHref>
-            <span
-              className={`${styles.navLink} ${
-                isActive("/transactions") ? styles.activeLink : ""
-              }`}
-            >
-              Transactions
-            </span>
-          </Link>
+          { (
+            <>
+              <Link href="/dashboard" passHref>
+                <span
+                  className={`${styles.navLink} ${
+                    isActive("/dashboard") ? styles.activeLink : ""
+                  }`}
+                >
+                  Dashboard
+                </span>
+              </Link>
+              <Link href="/create-request" passHref>
+                <span
+                  className={`${styles.navLink} ${
+                    isActive("/create-request") ? styles.activeLink : ""
+                  }`}
+                >
+                  Create Request
+                </span>
+              </Link>
+              <Link href="/transactions" passHref>
+                <span
+                  className={`${styles.navLink} ${
+                    isActive("/transactions") ? styles.activeLink : ""
+                  }`}
+                >
+                  Transactions
+                </span>
+              </Link>
+            </>
+          )}
         </div>
 
+        {/* Search Bar */}
         <div className={styles.searchContainer}>
           <Image
             src="/search-icon.svg"
@@ -153,20 +167,25 @@ const NavBar = () => {
           )}
         </div>
 
+        {/* Auth and Notifications */}
         <div className={styles.authLinks}>
+          {isLoggedIn && (
+            <>
+              {/* Notifications */}
+              <FontAwesomeIcon
+                icon={faBell}
+                className={styles.authLink}
+                title="Notifications"
+                onClick={handleNotificationsClick}
+              />
+              {showNotifications && <NotificationsDropdown />}
+            </>
+          )}
+
+          {/* Authentication Links */}
           {isLoggedIn ? (
             <>
-              
-              <Link href="/transactions" passHref>
-                <span
-                  className={`${styles.authLink} ${
-                    isActive("/transactions") ? styles.activeLink : ""
-                  }`}
-                  title="Transactions"
-                >
-                  <FontAwesomeIcon icon={faHistory} />
-                </span>
-              </Link>
+              {/* Logout */}
               <span
                 onClick={() => setShowLogoutConfirm(true)}
                 className={styles.authLink}
@@ -177,7 +196,9 @@ const NavBar = () => {
               {showLogoutConfirm && (
                 <div className={styles.logoutConfirm}>
                   <div className={styles.logoutConfirmContent}>
-                    <p style={{ color: "#001F3F" }}>Are you sure you want to log out?</p>
+                    <p style={{ color: "#001F3F" }}>
+                      Are you sure you want to log out?
+                    </p>
                     <div className={styles.logoutConfirmButtons}>
                       <button
                         onClick={() => setShowLogoutConfirm(false)}
@@ -211,6 +232,8 @@ const NavBar = () => {
               </Link>
             </>
           )}
+
+          {/* Additional Links */}
           <Link href="/contact" passHref>
             <span
               className={`${styles.authLink} ${

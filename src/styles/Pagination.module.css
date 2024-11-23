@@ -1,8 +1,17 @@
+.contentSection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    justify-content: center;
+    align-items: stretch;
+    margin-bottom: 2rem; /* Add space below cards for pagination */
+}
+
 .paginationContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    margin: 20px 0; /* Add spacing above and below pagination */
 }
 
 .paginationButton {
@@ -13,13 +22,19 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.paginationButton:hover {
+    background-color: #005bb5;
 }
 
 .paginationButton:disabled {
-    background-color: #cccccc;
+    background-color: #969090;
     cursor: not-allowed;
 }
 
 .pageInfo {
     font-size: 16px;
+    color: #555;
 }

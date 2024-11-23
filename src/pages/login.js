@@ -24,19 +24,23 @@ const Login = () => {
 	const handleLogin = async (event) => {
 		event.preventDefault(); // Prevent the default form submission
 		setError(""); // Clear any previous errors
-
+	
 		try {
 			const response = await axios.post("/api/auth/login", formData);
 			if (response.data.success) {
 				// Pass the token and user data to the login function
 				login(response.data.token, response.data.data);
-				router.push("/"); // Redirect to the homepage or another protected route
+				router.push("/dashboard"); // Redirect to a protected route
 			}
 		} catch (err) {
-			setError(err.response?.data?.error || "An unexpected error occurred");
+			if (!err.response) {
+				setError("Network error. Please check your connection.");
+			} else {
+				setError(err.response?.data?.error || "An unexpected error occurred");
+			}
 		}
 	};
-
+	
 	return (
 		<>
   <Head>

@@ -7,94 +7,79 @@ import styles from '../styles/Dashboard.module.css';
 const Dashboard = () => {
     const router = useRouter();
     const [requests, setRequests] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1); // Current page state
-    const [totalPages, setTotalPages] = useState(1); // Total pages state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [selectedFilter, setSelectedFilter] = useState('All');
     const [sortBy, setSortBy] = useState('Newest');
-    const requestsPerPage = 6; // Number of requests per page
-
-    // Fetch requests from the backend
-    const fetchRequests = async () => {
-        try {
-            const response = await axios.get(`/api/requests?page=${currentPage}&limit=${requestsPerPage}`);
-            setRequests(response.data.requests);
-            setTotalPages(response.data.totalPages);
-        } catch (error) {
-            console.error('Error fetching requests:', error.message);
-            if (error.response?.status === 401) {
-                router.push('/login');
-            }
-        }
-    };
+    const requestsPerPage = 8;
+    const [notifications, setNotifications] = useState([]);
+    const token = "your-auth-token"; // Replace with actual token logic
 
     useEffect(() => {
-        fetchRequests(); // Fetch all requests on component mount or page change
+        const fetchNotifications = async () => {
+            try {
+                const response = await fetch('/api/notifications', {
+                    method: 'GET',
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = await response.json();
+                if (response.ok) setNotifications(data.data);
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        };
+
+        fetchNotifications();
+    }, []); 
+
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                const response = await axios.get(`/api/requests?page=${currentPage}&limit=${requestsPerPage}`);
+                setRequests(response.data.requests);
+                setTotalPages(response.data.totalPages);
+            } catch (error) {
+                console.error('Error fetching requests:', error.message);
+                if (error.response?.status === 401) router.push('/login');
+            }
+        };
+
+        fetchRequests();
     }, [currentPage]);
 
     const applyFilterAndSort = () => {
         let filteredRequests = [...requests];
 
-        // Apply filter
-        if (selectedFilter === 'Open') {
-            filteredRequests = filteredRequests.filter((req) => !req.isClosed);
-        } else if (selectedFilter === 'Expired') {
-            filteredRequests = filteredRequests.filter((req) => req.isExpired);
-        }
+        if (selectedFilter === 'Open') filteredRequests = filteredRequests.filter((req) => !req.isClosed);
+        if (selectedFilter === 'Expired') filteredRequests = filteredRequests.filter((req) => req.isExpired);
 
-        // Apply sorting
-        if (sortBy === 'Newest') {
-            filteredRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        } else if (sortBy === 'Fewest TimeCoins') {
-            filteredRequests.sort((a, b) => a.timeCoins - b.timeCoins);
-        } else if (sortBy === 'Most TimeCoins') {
-            filteredRequests.sort((a, b) => b.timeCoins - a.timeCoins);
-        }
+        if (sortBy === 'Newest') filteredRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        if (sortBy === 'Fewest TimeCoins') filteredRequests.sort((a, b) => a.timeCoins - b.timeCoins);
+        if (sortBy === 'Most TimeCoins') filteredRequests.sort((a, b) => b.timeCoins - a.timeCoins);
 
         return filteredRequests;
     };
 
-    const handleFilterChange = (e) => {
-        setSelectedFilter(e.target.value);
-        setCurrentPage(1); // Reset to the first page on filter change
-    };
+    const handleFilterChange = (e) => setSelectedFilter(e.target.value);
+    const handleSortChange = (e) => setSortBy(e.target.value);
+    const handlePageChange = (page) => setCurrentPage(page);
 
-    const handleSortChange = (e) => {
-        setSortBy(e.target.value);
-        setCurrentPage(1); // Reset to the first page on sort change
-    };
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page); // Update current page
-    };
-
-    const handleCreateRequestClick = () => {
-        router.push('/create-request');
-    };
-
+    const handleCreateRequestClick = () => router.push('/create-request');
     const handleAcceptRequest = async (requestId) => {
         try {
-            const token = localStorage.getItem('token'); // Get token from localStorage
-            if (!token) {
-                throw new Error('No token found');
-            }
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No token found');
 
             const response = await axios.post(
                 '/api/requests/accept',
                 { requestId },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`, // Include token in the header
-                    },
-                }
+                { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            if (response.data.success) {
-                alert('Request accepted successfully!');
-                fetchRequests(); // Refresh the requests after accepting one
-            }
+            if (response.data.success) alert('Request accepted successfully!');
         } catch (error) {
             console.error('Error accepting request:', error.message);
-            alert('Failed to accept the request. Please try again.');
+            alert('Failed to accept the request.');
         }
     };
 
@@ -103,15 +88,25 @@ const Dashboard = () => {
     return (
         <div className={styles.dashboardContainer}>
             <div className={styles.dashboardHeader}>
-                <h1>Help Someone</h1>
-                <p>Explore community requests to find ways to assist.</p>
+               
+                <p>Manage community requests and notifications.</p>
+            </div>
+
+            <div className={styles.notificationsSection}>
+                <h2>Notifications</h2>
+                {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                        <div key={notification._id} className={styles.notification}>
+                            <p>{notification.message}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p>No notifications available.</p>
+                )}
             </div>
 
             <div className={styles.dashboardActions}>
-                <button
-                    className={styles.createRequestButton}
-                    onClick={handleCreateRequestClick}
-                >
+                <button className={styles.createRequestButton} onClick={handleCreateRequestClick}>
                     + Create Request
                 </button>
             </div>
@@ -136,7 +131,6 @@ const Dashboard = () => {
             </div>
 
             <div className={styles.contentSection}>
-                <h2>Available Requests</h2>
                 {displayedRequests.length > 0 ? (
                     displayedRequests.map((request) => (
                         <div key={request._id} className={styles.card}>
@@ -146,23 +140,10 @@ const Dashboard = () => {
                                 <strong>TimeCoins:</strong> {request.timeCoins}
                             </p>
                             <p>
-                                <strong>Created By:</strong>{' '}
-                                {request.creator
-                                    ? `${request.creator.firstName} ${request.creator.lastName}`
-                                    : 'Unknown'}
+                                <strong>Created By:</strong> {request.creator ? `${request.creator.firstName} ${request.creator.lastName}` : 'Unknown'}
                             </p>
-                            {request.imageUrl && (
-                                <img
-                                    src={request.imageUrl}
-                                    alt={request.title}
-                                    className={styles.requestImage}
-                                />
-                            )}
-
-                            <button
-                                className={styles.acceptButton}
-                                onClick={() => handleAcceptRequest(request._id)}
-                            >
+                            {request.imageUrl && <img src={request.imageUrl} alt={request.title} className={styles.requestImage} />}
+                            <button className={styles.acceptButton} onClick={() => handleAcceptRequest(request._id)}>
                                 Accept
                             </button>
                         </div>
@@ -170,14 +151,9 @@ const Dashboard = () => {
                 ) : (
                     <p>No requests found.</p>
                 )}
-
-                {/* Pagination Component */}
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
             </div>
+
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
     );
 };

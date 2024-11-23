@@ -1,31 +1,40 @@
 .dashboardContainer {
     padding: 2rem;
+    background-color: #a89898; /* Light background for better contrast */
 }
 
+/* Header Section */
 .dashboardHeader {
     text-align: center;
     margin-bottom: 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
 }
 
+/* Actions Section */
 .dashboardActions {
     text-align: center;
     margin-bottom: 2rem;
 }
 
 .createRequestButton {
-    background-color: #0070f3;
-    color: white;
+    background-color: #87878d;
+    color: #fff; /* Ensure better contrast */
     padding: 0.75rem 1.5rem;
     border: none;
+    font-weight: bold;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .createRequestButton:hover {
-    background-color: #005bb5;
+    background-color: #f7f97e;
+    color: #000;
 }
 
+/* Filters Section */
 .filters {
     display: flex;
     justify-content: center;
@@ -47,36 +56,99 @@
     border-radius: 4px;
 }
 
+/* Content Section */
 .contentSection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    justify-content: center;
+    align-items: stretch;
+    padding: 1rem;
+}
+
+/* Card Styling */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: rgb(125, 120, 120);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start; /* Ensures content starts at the top */
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 400px; /* Uniform height for all cards */
 }
 
-.card {
-    border: 1px solid #ccc;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    width: 80%;
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
+
+/* Text Content */
+.cardText {
+    margin-bottom: 0.5rem;
+}
+
+/* Request Image */
 .requestImage {
-    max-width: 100%;
-    height: auto;
-    margin-top: 10px;
+    width: 100%;
+    max-width: 300px; /* Set maximum width for all images */
+    height: 200px; /* Fixed height for consistency */
+    object-fit: cover; /* Scales the image without distortion */
     border-radius: 8px;
+    margin-top: auto; /* Ensures images appear below text */
 }
+
+/* Accept Button */
 .acceptButton {
-    background-color: #28a745;
+    background-color: #87878d;
     color: white;
     border: none;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: auto;
+    transition: background-color 0.3s ease;
+}
+
+.acceptButton:hover {
+    background-color: #f7f97e;
+    color: #141212;
+}
+
+/* Notifications Button */
+.NotificationButton {
+    background-color: #87878d;
+    color: rgb(203, 96, 96);
+    border: none;
+    font-weight: bold;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
     margin-top: 10px;
 }
 
-.acceptButton:hover {
-    background-color: #218838;
+.NotificationButton:hover {
+    background-color: #4a4a4a;
 }
 
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .contentSection {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .card {
+        height: auto; /* Allow cards to adjust height on smaller screens */
+    }
+
+    .requestImage {
+        height: 150px; /* Adjust image height for smaller cards */
+    }
+}

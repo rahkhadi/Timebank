@@ -7,8 +7,10 @@ const UserSchema = new mongoose.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    username: { type: String, required: true, unique: true }, // Add username field
 });
 
+// Hash password before saving the user document
 UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);

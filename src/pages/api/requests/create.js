@@ -1,13 +1,15 @@
-import dbConnect from '@/utils/dbConnect';
-import multer from 'multer';
-import Request from '@/utils/requestModels';
+import dbConnect from "@/utils/dbConnect";
+import multer from "multer";
+import Request from "@/utils/requestModels";
+import authMiddleware from "@/utils/authMiddleware";
 
 const storage = multer.diskStorage({
-    destination: 'public/uploads/',
+    destination: "public/uploads/",
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+        cb(null, Date.now() + "-" + file.originalname);
     },
 });
+
 const upload = multer({ storage });
 
 export const config = {
@@ -16,45 +18,41 @@ export const config = {
     },
 };
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     await dbConnect();
 
-    if (req.method === 'POST') {
-        upload.single('image')(req, res, async (err) => {
+    if (req.method === "POST") {
+        upload.single("image")(req, res, async (err) => {
             if (err) {
-                return res.status(500).json({ error: 'File upload error' });
+                return res.status(500).json({ error: "File upload error" });
             }
 
             const { title, description, timeCoins } = req.body;
+            const timeCoinsNumber = parseInt(timeCoins, 10);
             const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
-            if (!title || !description || !timeCoins) {
-                return res.status(400).json({ error: 'All fields are required' });
+            if (!title || !description || isNaN(timeCoinsNumber)) {
+                return res.status(400).json({ error: "All fields are required" });
             }
 
             try {
                 const newRequest = new Request({
                     title,
                     description,
-                    timeCoins,
+                    timeCoins: timeCoinsNumber,
                     imageUrl,
+                    createdBy: req.user.userId,
                 });
+
                 await newRequest.save();
-                res.status(201).json(newRequest);
+                return res.status(201).json(newRequest);
             } catch (error) {
-                console.error('Error saving request:', error);
-                res.status(500).json({ error: 'Failed to create request' });
+                return res.status(500).json({ error: "Failed to create request" });
             }
         });
-    } else if (req.method === 'GET') {
-        try {
-            const requests = await Request.find({});
-            res.status(200).json(requests);
-        } catch (error) {
-            console.error('Error fetching requests:', error);
-            res.status(500).json({ error: 'Failed to fetch requests' });
-        }
     } else {
-        res.status(405).json({ error: 'Method Not Allowed' });
+        return res.status(405).json({ error: "Method Not Allowed" });
     }
 }
+
+export default authMiddleware(handler);
