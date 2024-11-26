@@ -16,13 +16,6 @@ const Contact = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Simple validation for phone number
-        const phoneRegex = /^[0-9]{10,15}$/;
-        if (!phoneRegex.test(formData.phone)) {
-            setStatus("Please enter a valid phone number.");
-            return;
-        }
-
         try {
             const response = await fetch("/api/contact", {
                 method: "POST",
@@ -35,10 +28,10 @@ const Contact = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setStatus("Message sent successfully!");
-                setFormData({ name: "", email: "", phone: "", message: "" });
+                setStatus(data.success); // Show success message from API
+                setFormData({ name: "", email: "", phone: "", message: "" }); // Reset form
             } else {
-                setStatus(data.error || "There was an error sending your message.");
+                setStatus(data.error || "There was an error sending your message. Please try again.");
             }
         } catch (error) {
             console.error("Error submitting contact form:", error);
@@ -49,46 +42,42 @@ const Contact = () => {
     return (
         <div className="contact-container">
             <h1>Contact Us</h1>
-            <p>Have a question or feedback? We'd love to hear from you!</p>
+            <p>We&apos;d love to hear from you!</p>
 
             <form onSubmit={handleSubmit} className="contact-form">
-                <label htmlFor="name">
+                <label>
                     Name:
                     <input
                         type="text"
-                        id="name"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
                         required
                     />
                 </label>
-                <label htmlFor="email">
+                <label>
                     Email:
                     <input
                         type="email"
-                        id="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
                         required
                     />
                 </label>
-                <label htmlFor="phone">
+                <label>
                     Phone:
                     <input
                         type="text"
-                        id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
                         required
                     />
                 </label>
-                <label htmlFor="message">
+                <label>
                     Message:
                     <textarea
-                        id="message"
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
@@ -98,22 +87,48 @@ const Contact = () => {
                 <button type="submit">Send Message</button>
             </form>
 
-            {status && (
-                <p
-                    className={`status-message ${
-                        status.includes("successfully") ? "text-green-500" : "text-red-500"
-                    }`}
-                >
-                    {status}
-                </p>
-            )}
+            {status && <p className="status-message">{status}</p>}
 
             <style jsx>{`
-                .status-message.text-green-500 {
-                    color: green;
+                .contact-container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    text-align: center;
                 }
-                .status-message.text-red-500 {
-                    color: red;
+                .contact-form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .contact-form label {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: start;
+                }
+                .contact-form input,
+                .contact-form textarea {
+                    width: 100%;
+                    padding: 10px;
+                    margin-top: 5px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+                .contact-form button {
+                    padding: 10px 20px;
+                    background-color: #0070f3;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }
+                .contact-form button:hover {
+                    background-color: #005bb5;
+                }
+                .status-message {
+                    margin-top: 20px;
+                    font-weight: bold;
+                    color: green;
                 }
             `}</style>
         </div>
