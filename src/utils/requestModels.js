@@ -6,7 +6,8 @@ const RequestSchema = new mongoose.Schema({
     timeCoins: { type: Number, required: true },
     imageUrl: { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User who created the request
-    acceptedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // User who accepted the request
+    acceptedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // User who accepted the request
+    isClosed: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
 });
 

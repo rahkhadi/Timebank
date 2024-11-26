@@ -1,10 +1,11 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
-const NotificationSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // User receiving the notification
-    message: { type: String, required: true },
-    isRead: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-});
+const NotificationSchema = new mongoose.Schema(
+    {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the User model
+        message: { type: String, required: true },
+    },
+    { timestamps: true } // Automatically adds createdAt and updatedAt fields
+);
 
-module.exports = mongoose.models.Notification || mongoose.model("Notification", NotificationSchema);
+export default mongoose.models.Notification || mongoose.model('Notification', NotificationSchema);

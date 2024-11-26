@@ -1,38 +1,46 @@
-// pages/api/contact.js
-import sendgrid from "@sendgrid/mail";
+import connectDB from "@/utils/dbConnect";
+import ContactMessage from "@/utils/contactMessageModel";
+import nodemailer from "nodemailer";
 
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+connectDB();
 
-const sendEmail = async (req, res) => {
-	if (req.method === "POST") {
-		const { name, email, phone, reason, message } = req.body;
+export default async function handler(req, res) {
+    if (req.method === "POST") {
+        const { name, email, phone, message } = req.body;
 
-		// Prepare the email content
-		const mailOptions = {
-			to: "rahimkhaadimhussain219@gmail.com",
-			from: "rahimkhadimhussain219@gmail.com",
-			subject: "New Message from Contact Form",
-			html: `
-          <h1>${reason}</h1>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Phone:</strong> ${phone}</p>
-          <p><strong>Message:</strong></p>
-          <p>${message}</p>
-        `,
-		};
+        if (!name || !email || !phone || !message) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
 
-		try {
-			// Send the email
-			await sendgrid.send(mailOptions);
-			res.status(200).json({ message: "Message sent successfully" });
-		} catch (error) {
-			console.error("Error sending email:", error);
-			res.status(500).json({ message: "Error sending message" });
-		}
-	} else {
-		res.status(405).json({ message: "Method not allowed" });
-	}
-};
+        try {
+            // Save the message to the database
+            await ContactMessage.create({ name, email, phone, message });
 
-export default sendEmail;
+            // Set up Nodemailer transporter
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+
+            // Send email notification
+            await transporter.sendMail({
+                from: email,
+                to: "rahim.aziz555@gmail.com",
+                subject: "New Contact Form Submission",
+                text: `Message from: ${name} <${email}> (Phone: ${phone})\n\n${message}`,
+            });
+
+            // Respond with success
+            res.status(200).json({ success: "Your message has been sent successfully!" });
+        } catch (error) {
+            console.error("Error handling contact form:", error);
+            res.status(500).json({ error: "An unexpected error occurred." });
+        }
+    } else {
+        res.setHeader("Allow", ["POST"]);
+        res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+}

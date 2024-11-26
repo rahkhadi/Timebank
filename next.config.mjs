@@ -3,22 +3,17 @@ dotenv.config();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Enables React's Strict Mode to catch potential issues in React components
     reactStrictMode: true,
-    images: {
-        remotePatterns: [
-            {
-                protocol: "https",
-                hostname: "image.tmdb.org",
-                pathname: "/t/p/**",
-            },
-        ],
-    },
+
+    // Runtime environment variables
     env: {
-        MONGODB_URI: process.env.MONGODB_URI,
-        JWT_SECRET: process.env.JWT_SECRET,
-        JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-        SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
-        TMDB_API_KEY: process.env.TMDB_API_KEY,
+        MONGODB_URI: process.env.MONGODB_URI, // MongoDB connection URI
+        JWT_SECRET: process.env.JWT_SECRET, // JWT secret for token signing
+        JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET, // Refresh token secret
+        SESSION_SECRET: process.env.SESSION_SECRET, // Session secret
+        EMAIL_USER: process.env.EMAIL_USER, // Email service user
+        EMAIL_PASS: process.env.EMAIL_PASS, // Email service password
     },
 };
 

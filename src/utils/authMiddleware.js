@@ -1,27 +1,24 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 const authMiddleware = (handler) => async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1] || req.cookies.token;
+    const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
 
     if (!token) {
-        return res.status(401).json({ error: 'Not authenticated. Token is missing.' });
+        return res.status(401).json({ error: "Unauthorized" });
     }
 
     try {
-        // Decode the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Log decoded user (AFTER initialization)
-        console.log("Decoded user:", decoded);
+        req.user = {
+            userId: decoded.userId, // Attach userId from token
+            name: decoded.username || "User", // Optional: Attach username
+        };
 
-        // Attach the user ID to the request
-        req.user = { userId: decoded.userId };
-
-        // Proceed to the handler
         return handler(req, res);
     } catch (error) {
-        console.error('Token verification error:', error);
-        return res.status(401).json({ error: 'Invalid token' });
+        console.error("Token verification error:", error);
+        return res.status(401).json({ error: "Invalid or expired token" });
     }
 };
 

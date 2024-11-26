@@ -1,152 +1,138 @@
-import Head from "next/head";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
-import Router from "next/router";
+import { useState } from "react";
 
-const ContactPage = () => {
-    const { isLoggedIn, user } = useAuth();
+const Contact = () => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         phone: "",
-        reason: "",
         message: "",
     });
+    const [status, setStatus] = useState("");
 
-    // Prefill email when user data is available
-    useEffect(() => {
-        if (user && user.email) {
-            setFormData((prev) => ({ ...prev, email: user.email }));
-        }
-    }, [user]);
-
-    // Redirect to login if not authenticated
-    useEffect(() => {
-        if (!isLoggedIn) {
-            Router.push("/login");
-        }
-    }, [isLoggedIn]);
-
-    const handleInputChange = (event) => {
-        setFormData({
-            ...formData,
-            [event.target.name]: event.target.value,
-        });
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
         try {
-            const response = await axios.post("/api/contact", formData);
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
 
-            if (response.status === 200) {
-                toast.success("Message sent successfully!");
-                setFormData({
-                    name: "",
-                    email: user.email || "",
-                    phone: "",
-                    reason: "",
-                    message: "",
-                });
+            const data = await response.json();
+
+            if (response.ok) {
+                setStatus(data.success); // Show success message from API
+                setFormData({ name: "", email: "", phone: "", message: "" }); // Reset form
             } else {
-                toast.error("Error sending message.");
+                setStatus(data.error || "There was an error sending your message. Please try again.");
             }
         } catch (error) {
-            console.error("Error sending message:", error);
-            toast.error("Failed to send the message.");
+            console.error("Error submitting contact form:", error);
+            setStatus("An unexpected error occurred. Please try again.");
         }
     };
 
-    if (!isLoggedIn) {
-        return <p>Redirecting to login...</p>; // Simple fallback while redirecting
-    }
-
     return (
-        <div className="form-color max-w-md mx-auto mt-16 p-6 border border-gray-300 rounded-lg bg-white shadow-md">
-            <Head>
-                <title>Contact Us</title>
-            </Head>
-            <h1 className="text-2xl font-bold text-center mb-6">Contact Us</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label htmlFor="email" className="block text-sm font-medium">
-                        Email:
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        readOnly
-                        disabled
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium">
-                        Name:
-                    </label>
+        <div className="contact-container">
+            <h1>Contact Us</h1>
+            <p>Have a question or feedback? We'd love to hear from you!</p>
+
+            <form onSubmit={handleSubmit} className="contact-form">
+                <label>
+                    Name:
                     <input
                         type="text"
-                        id="name"
                         name="name"
                         value={formData.name}
-                        onChange={handleInputChange}
+                        onChange={handleChange}
                         required
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937]"
                     />
-                </div>
-                <div>
-                    <label htmlFor="phone" className="block text-sm font-medium">
-                        Phone:
-                    </label>
+                </label>
+                <label>
+                    Email:
                     <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937]"
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
                     />
-                </div>
-                <div>
-                    <label htmlFor="reason" className="block text-sm font-medium">
-                        Reason for Contacting:
-                    </label>
+                </label>
+                <label>
+                    Phone:
                     <input
                         type="text"
-                        id="reason"
-                        name="reason"
-                        value={formData.reason}
-                        onChange={handleInputChange}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937]"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
                     />
-                </div>
-                <div>
-                    <label htmlFor="message" className="block text-sm font-medium">
-                        Message:
-                    </label>
+                </label>
+                <label>
+                    Message:
                     <textarea
-                        id="message"
                         name="message"
                         value={formData.message}
-                        onChange={handleInputChange}
+                        onChange={handleChange}
                         required
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937] h-28 resize-none"
                     />
-                </div>
-                <button
-                    type="submit"
-                    className="btn-submit w-full py-2 px-4 text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-[#1f2937]"
-                >
-                    Send
-                </button>
+                </label>
+                <button type="submit">Send Message</button>
             </form>
+
+            {status && <p className="status-message">{status}</p>}
+
+            <style jsx>{`
+                .contact-container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    text-align: center;
+                }
+                .contact-form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .contact-form label {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: start;
+                }
+                .contact-form input,
+                .contact-form textarea {
+                    width: 100%;
+                    padding: 10px;
+                    margin-top: 5px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+                .contact-form button {
+                    padding: 10px 20px;
+                    background-color: #0070f3;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }
+                .contact-form button:hover {
+                    background-color: #005bb5;
+                }
+                .status-message {
+                    margin-top: 20px;
+                    font-weight: bold;
+                    color: green;
+                }
+            `}</style>
         </div>
     );
 };
 
-export default ContactPage;
+export default Contact;

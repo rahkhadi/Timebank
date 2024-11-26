@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const next = require('next');
 const mongoose = require('mongoose');
+const authMiddleware = require('./src/utils/authMiddleware').default;
 
 // Middleware for parsing request bodies
 const app = express();
@@ -37,9 +38,9 @@ nextApp.prepare().then(() => {
     next();
   });
 
-  // Define routes for API endpoints
+  // Define routes for API endpoints with auth middleware
   server.use('/api/auth/signup', require('./pages/api/auth/signup').default);
-  server.use('/api/contact', require('./pages/api/contact').default);
+  server.use('/api/contact', authMiddleware, require('./pages/api/contact').default);
 
   // Handle all other requests through Next.js
   server.all('*', (req, res) => {

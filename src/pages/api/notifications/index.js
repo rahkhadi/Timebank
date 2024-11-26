@@ -6,9 +6,10 @@ const handler = async (req, res) => {
     await dbConnect();
 
     if (req.method === 'GET') {
-        const { userId } = req.user;
+        const { userId } = req.user; // Extract userId from authMiddleware
 
         try {
+            // Fetch notifications for the logged-in user, sorted by creation date
             const notifications = await Notification.find({ user: userId }).sort({ createdAt: -1 });
             res.status(200).json({ success: true, data: notifications });
         } catch (error) {

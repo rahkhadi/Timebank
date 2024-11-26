@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import NotificationsDropdown from "./NotificationsDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSignInAlt,
@@ -9,98 +8,62 @@ import {
   faEnvelope,
   faSignOutAlt,
   faInfoCircle,
-  faBell, // Add bell icon for notifications
+  faHistory,
+  faBell,
+  faComments,
 } from "@fortawesome/free-solid-svg-icons";
+
 import Image from "next/image";
-import { useAuth } from "../context/AuthContext"; // For authentication logic
-import axios from "axios";
-import RequestDropdown from "./RequestDropdown";
+import { useAuth } from "../context/AuthContext";
 import styles from "../styles/NavBar.module.css";
 
 const NavBar = () => {
-  const { isLoggedIn, logout, currentUser } = useAuth(); // Auth state and methods
+  const { isLoggedIn, logout, currentUser } = useAuth(); // Added currentUser
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false); // For toggling notifications dropdown
+  const [notifications, setNotifications] = useState(0); // Number of notifications
   const router = useRouter();
 
-  // Handle user logout
-  const handleLogout = () => {
-    logout(); // Clears auth state and token
-    setShowLogoutConfirm(false); // Close confirmation dialog
-  };
-
-  // Handle search input changes
-  const handleSearchChange = async (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term.trim() === "") {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
-      const response = await axios.get("/api/requests/search", {
-        params: { query: term },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setSearchResults(response.data);
-    } catch (error) {
-      console.error("Error fetching search results:", error);
-      setSearchResults([]);
-    }
-  };
-
-  // Close dropdown when clicked outside
-  const closeDropdown = () => {
-    setSearchResults([]);
-  };
-
-  // Toggle notifications dropdown
-  const handleNotificationsClick = () => {
-    setShowNotifications(!showNotifications); // Open or close dropdown
-  };
-
-  // Determine if a route is active
-  const isActive = (pathname) => router.pathname === pathname;
-
-  // Keyboard events for accessibility
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setShowLogoutConfirm(false);
-        setShowNotifications(false); // Close notifications dropdown
-      }
-      if (event.key === "Enter" && showLogoutConfirm) {
-        handleLogout();
+    // Fetch notifications count if the user is logged in
+    const fetchNotifications = async () => {
+      if (isLoggedIn) {
+        try {
+          const response = await fetch("/api/notifications", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // Use token for authenticated request
+            },
+          });
+          const data = await response.json();
+          if (data.success) {
+            setNotifications(data.data.length); // Update the count of notifications
+          }
+        } catch (error) {
+          console.error("Error fetching notifications:", error);
+        }
       }
     };
 
-    if (showLogoutConfirm || showNotifications) {
-      document.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.removeEventListener("keydown", handleKeyDown);
+    fetchNotifications();
+  }, [isLoggedIn]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Error logging out:", error.message);
     }
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [showLogoutConfirm, showNotifications]);
+  };
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.navbarContainer}>
-        {/* Logo */}
+        {/* Logo Section */}
         <div className={styles.logoContainer}>
           <Link href="/" passHref>
             <div className="cursor-pointer flex items-center">
               <Image
-                className={`${styles.logo} inline`}
+                className={styles.logo}
                 src="/icon.jpg"
                 alt="TimeBank Logo"
                 width={50}
@@ -113,79 +76,80 @@ const NavBar = () => {
 
         {/* Navigation Links */}
         <div className={styles.navLinks}>
-          { (
-            <>
-              <Link href="/dashboard" passHref>
-                <span
-                  className={`${styles.navLink} ${
-                    isActive("/dashboard") ? styles.activeLink : ""
-                  }`}
-                >
-                  Dashboard
-                </span>
-              </Link>
-              <Link href="/create-request" passHref>
-                <span
-                  className={`${styles.navLink} ${
-                    isActive("/create-request") ? styles.activeLink : ""
-                  }`}
-                >
-                  Create Request
-                </span>
-              </Link>
-              <Link href="/transactions" passHref>
-                <span
-                  className={`${styles.navLink} ${
-                    isActive("/transactions") ? styles.activeLink : ""
-                  }`}
-                >
-                  Transactions
-                </span>
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Search Bar */}
-        <div className={styles.searchContainer}>
-          <Image
-            src="/search-icon.svg"
-            alt="Search"
-            width={20}
-            height={20}
-            className={styles.searchIcon}
-          />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className={styles.searchInput}
-            placeholder="Search for requests..."
-          />
-          {searchResults.length > 0 && (
-            <RequestDropdown requests={searchResults} onClose={closeDropdown} />
-          )}
-        </div>
-
-        {/* Auth and Notifications */}
-        <div className={styles.authLinks}>
+          <Link href="/dashboard" passHref>
+            <span
+              className={`${styles.navLink} ${
+                router.pathname === "/dashboard" ? styles.activeLink : ""
+              }`}
+            >
+              Dashboard
+            </span>
+          </Link>
+          <Link href="/create-request" passHref>
+            <span
+              className={`${styles.navLink} ${
+                router.pathname === "/create-request" ? styles.activeLink : ""
+              }`}
+            >
+              Create Request
+            </span>
+          </Link>
+          <Link href="/transactions" passHref>
+            <span
+              className={`${styles.navLink} ${
+                router.pathname === "/transactions" ? styles.activeLink : ""
+              }`}
+            >
+              Transactions
+            </span>
+          </Link>
           {isLoggedIn && (
-            <>
-              {/* Notifications */}
-              <FontAwesomeIcon
-                icon={faBell}
-                className={styles.authLink}
-                title="Notifications"
-                onClick={handleNotificationsClick}
-              />
-              {showNotifications && <NotificationsDropdown />}
-            </>
+            <Link href="/messaging" passHref>
+              <span
+                className={`${styles.navLink} ${
+                  router.pathname === "/messaging" ? styles.activeLink : ""
+                }`}
+              >
+                Messaging
+              </span>
+            </Link>
           )}
+        </div>
 
-          {/* Authentication Links */}
+        {/* Authentication and Other Actions */}
+        <div className={styles.authLinks}>
           {isLoggedIn ? (
             <>
-              {/* Logout */}
+              {/* Notifications Icon */}
+              <Link href="/notifications" passHref>
+                <span
+                  className={`${styles.authLink} ${
+                    router.pathname === "/notifications" ? styles.activeLink : ""
+                  }`}
+                  title="Notifications"
+                >
+                  <FontAwesomeIcon icon={faBell} />
+                  {notifications > 0 && (
+                    <span className={styles.notificationBadge}>
+                      {notifications}
+                    </span>
+                  )}
+                </span>
+              </Link>
+
+              {/* Messaging Icon */}
+              <Link href="/messaging" passHref>
+                <span
+                  className={`${styles.authLink} ${
+                    router.pathname === "/messaging" ? styles.activeLink : ""
+                  }`}
+                  title="Messaging"
+                >
+                  <FontAwesomeIcon icon={faComments} />
+                </span>
+              </Link>
+
+              {/* Logout Button */}
               <span
                 onClick={() => setShowLogoutConfirm(true)}
                 className={styles.authLink}
@@ -193,23 +157,21 @@ const NavBar = () => {
               >
                 <FontAwesomeIcon icon={faSignOutAlt} />
               </span>
+
               {showLogoutConfirm && (
                 <div className={styles.logoutConfirm}>
                   <div className={styles.logoutConfirmContent}>
-                    <p style={{ color: "#001F3F" }}>
-                      Are you sure you want to log out?
-                    </p>
+                    <p>Are you sure you want to log out?</p>
                     <div className={styles.logoutConfirmButtons}>
                       <button
                         onClick={() => setShowLogoutConfirm(false)}
-                        className={`${styles.logoutConfirmButton} ${styles.cancelButton}`}
-                        style={{ color: "#636363" }}
+                        className={styles.cancelButton}
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleLogout}
-                        className={`${styles.logoutConfirmButton} ${styles.logoutButton}`}
+                        className={styles.logoutButton}
                       >
                         Log Out
                       </button>
@@ -232,12 +194,10 @@ const NavBar = () => {
               </Link>
             </>
           )}
-
-          {/* Additional Links */}
           <Link href="/contact" passHref>
             <span
               className={`${styles.authLink} ${
-                isActive("/contact") ? styles.activeLink : ""
+                router.pathname === "/contact" ? styles.activeLink : ""
               }`}
               title="Contact"
             >
@@ -247,7 +207,7 @@ const NavBar = () => {
           <Link href="/about" passHref>
             <span
               className={`${styles.authLink} ${
-                isActive("/about") ? styles.activeLink : ""
+                router.pathname === "/about" ? styles.activeLink : ""
               }`}
               title="About"
             >
