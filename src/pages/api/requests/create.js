@@ -24,6 +24,7 @@ async function handler(req, res) {
     if (req.method === "POST") {
         upload.single("image")(req, res, async (err) => {
             if (err) {
+                console.error("File upload error:", err);
                 return res.status(500).json({ error: "File upload error" });
             }
 
@@ -41,12 +42,13 @@ async function handler(req, res) {
                     description,
                     timeCoins: timeCoinsNumber,
                     imageUrl,
-                    createdBy: req.user.userId,
+                    createdBy: req.user.userId, // Make sure `req.user` is correctly populated
                 });
 
                 await newRequest.save();
-                return res.status(201).json(newRequest);
+                return res.status(201).json({ success: true, request: newRequest });
             } catch (error) {
+                console.error("Failed to create request:", error);
                 return res.status(500).json({ error: "Failed to create request" });
             }
         });

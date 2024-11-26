@@ -1,35 +1,40 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import styles from '../styles/CreateRequest.module.css';
+import React, { useState } from "react";
+import axios from "axios";
+import styles from "../styles/CreateRequest.module.css";
 
 const CreateRequest = () => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [timeCoins, setTimeCoins] = useState('');
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [timeCoins, setTimeCoins] = useState("");
     const [image, setImage] = useState(null);
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('timeCoins', timeCoins);
-        if (image) formData.append('image', image);
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("timeCoins", timeCoins);
+        if (image) formData.append("image", image);
 
         try {
-            const response = await axios.post('/api/requests/create', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            const token = localStorage.getItem("token"); // Retrieve token from localStorage
+            const response = await axios.post("/api/requests/create", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`, // Pass the token in the header
+                },
             });
-            setMessage('Request created successfully!');
-            setTitle('');
-            setDescription('');
-            setTimeCoins('');
+
+            setMessage("Request created successfully!");
+            setTitle("");
+            setDescription("");
+            setTimeCoins("");
             setImage(null);
         } catch (error) {
-            console.error('Error creating request:', error.message);
-            setMessage('Failed to create request');
+            console.error("Error creating request:", error.response?.data || error.message);
+            setMessage(error.response?.data?.error || "Failed to create request");
         }
     };
 
@@ -46,7 +51,7 @@ const CreateRequest = () => {
                     required
                     className={styles.inputField}
                 />
-    
+
                 <label>Description</label>
                 <textarea
                     value={description}
@@ -54,7 +59,7 @@ const CreateRequest = () => {
                     required
                     className={styles.textareaField}
                 />
-    
+
                 <label>TimeCoins</label>
                 <input
                     type="number"
@@ -63,7 +68,7 @@ const CreateRequest = () => {
                     required
                     className={styles.inputField}
                 />
-    
+
                 <label>Upload Image</label>
                 <input
                     type="file"
@@ -71,7 +76,7 @@ const CreateRequest = () => {
                     accept="image/*"
                     className={styles.inputFile}
                 />
-    
+
                 <button type="submit" className={styles.submitButton}>
                     Submit Request
                 </button>
@@ -81,6 +86,3 @@ const CreateRequest = () => {
 };
 
 export default CreateRequest;
-
-
-

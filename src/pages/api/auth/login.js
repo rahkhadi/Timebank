@@ -1,66 +1,74 @@
+// pages/api/auth/login.js
 import connectDB from "@/utils/dbConnect";
 import User from "@/utils/userModel";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import cookie from "cookie";
 
 connectDB();
 
-export default async function handler(req, res) {
-    if (req.method !== "POST") {
-        res.setHeader("Allow", ["POST"]);
-        return res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
+export default async (req, res) => {
+	const { method } = req;
 
-    try {
-        const { usernameOrEmail, password } = req.body;
+	if (method !== "POST") {
+		res.setHeader("Allow", ["POST"]);
+		return res.status(405).end(`Method ${method} Not Allowed`);
+	}
 
-        if (!usernameOrEmail || !password) {
-            return res.status(400).json({ error: "All fields are required." });
-        }
+	try {
+		const { email, password } = req.body;
+		console.log("Login attempt for email:", email);
 
-        // Find user by email or username
-        const user = await User.findOne({
-            $or: [{ email: usernameOrEmail.toLowerCase() }, { username: usernameOrEmail }],
-        });
+		// Find the user by email
+		const user = await User.findOne({ email: email.toLowerCase() });
+		if (!user) {
+			return res.status(400).json({ success: false, error: "Invalid username or password." });
+		}
 
-        if (!user) {
-            return res.status(400).json({ error: "User not found." });
-        }
+		// Check if the password is correct
+		const isMatch = await bcrypt.compare(password, user.password);
+		if (!isMatch) {
+			return res.status(400).json({ success: false, error: "Invalid username or password." });
+		}
 
-        // Check if the password matches
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ error: "Incorrect password." });
-        }
+		// Generate access token (10 minutes)
+		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "30m" });
 
-        // Check for JWT_SECRET in environment variables
-        if (!process.env.JWT_SECRET) {
-            throw new Error("JWT_SECRET is not defined in environment variables.");
-        }
+		// Generate refresh token (7 days)
+		const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, {
+			expiresIn: "7d",
+		});
 
-        // Create JWT token
-        const token = jwt.sign(
-            { userId: user._id, username: user.username },
-            process.env.JWT_SECRET,
-            { expiresIn: "1d" }
-        );
+		// Set the tokens in cookies
+		res.setHeader("Set-Cookie", [
+			cookie.serialize("token", token, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV !== "development",
+				maxAge: 1200, // 30 minutes
+				sameSite: "strict",
+				path: "/",
+			}),
+			cookie.serialize("refreshToken", refreshToken, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV !== "development",
+				maxAge: 7 * 24 * 60 * 60, // 7 days
+				sameSite: "strict",
+				path: "/",
+			}),
+		]);
 
-        // Set cookie with JWT token
-        res.setHeader(
-            "Set-Cookie",
-            cookie.serialize("token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: 24 * 60 * 60, // 1 day
-                path: "/",
-            })
-        );
-
-        res.status(200).json({ success: "Logged in successfully!" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal server error." });
-    }
-}
+		res.status(200).json({
+			success: true,
+			data: {
+				id: user._id,
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
+			},
+			token, // Return the token to be stored
+		});
+	} catch (error) {
+		console.error("Login error:", error);
+		res.status(500).json({ success: false, error: "An unexpected error occurred" });
+	}
+};

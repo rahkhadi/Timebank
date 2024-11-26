@@ -1,97 +1,97 @@
+// pages/login.js
+import Head from 'next/head';
 import { useState } from "react";
+import axios from "axios";
 import { useRouter } from "next/router";
+import { useAuth } from "../context/AuthContext";
+import Link from "next/link";
 
 const Login = () => {
-    const [formData, setFormData] = useState({
-        usernameOrEmail: "",
-        password: "",
-    });
-    const [error, setError] = useState("");
-    const router = useRouter();
+	const [formData, setFormData] = useState({ email: "", password: "" });
+	const [error, setError] = useState("");
+	const router = useRouter();
+	const { login } = useAuth(); // Access the login function from AuthContext
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+	const handleInputChange = (event) => {
+		setFormData({
+			...formData,
+			[event.target.name]: event.target.value,
+		});
+	};
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+	const handleLogin = async (event) => {
+		event.preventDefault(); // Prevent the default form submission
+		setError(""); // Clear any previous errors
 
-        // Validate fields
-        if (!formData.usernameOrEmail || !formData.password) {
-            setError("All fields are required.");
-            return;
-        }
+		try {
+			const response = await axios.post("/api/auth/login", formData);
+			if (response.data.success) {
+				// Pass the token and user data to the login function
+				login(response.data.token, response.data.data);
+				router.push("/"); // Redirect to the homepage or another protected route
+			}
+		} catch (err) {
+			setError(err.response?.data?.error || "An unexpected error occurred");
+		}
+	};
 
-        try {
-            const response = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                // Redirect to dashboard after successful login
-                router.push("/dashboard");
-            } else {
-                const data = await response.json();
-                setError(data.error || "Invalid username/email or password.");
-            }
-        } catch (error) {
-            console.error(error);
-            setError("An unexpected error occurred. Please try again.");
-        }
-    };
-
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-200">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Username or Email:
-                        </label>
-                        <input
-                            type="text"
-                            name="usernameOrEmail"
-                            placeholder="Enter your username or email"
-                            value={formData.usernameOrEmail}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700 font-medium mb-2">
-                            Password:
-                        </label>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Enter your password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-gray-800 text-white py-2 rounded-md hover:bg-gray-900 transition duration-200"
-                    >
-                        Login
-                    </button>
-                </form>
-                <p className="mt-4 text-center text-gray-600">
-                    Don’t have an account?{" "}
-                    <a href="/signup" className="text-blue-500 hover:underline">
-                        Sign up here
-                    </a>
-                </p>
-            </div>
-        </div>
-    );
+	return (
+		<>
+  <Head>
+        <title>PopcornBuddy - Login</title>
+        <meta name="description" content="Login to PopcornBuddy." />
+      </Head>
+		<div className="max-w-md mx-auto mt-16 p-8 border border-gray-300 rounded-lg bg-white shadow-md">
+			<h1 className="text-3xl font-bold text-center mb-6">Login</h1>
+			{error && <p className="text-red-500 text-center mb-4">{error}</p>}
+			<form onSubmit={handleLogin} className="space-y-4">
+				<div>
+					<label htmlFor="email" className="block text-sm font-medium">
+						Email:
+					</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						value={formData.email}
+						onChange={handleInputChange}
+						required
+						className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937]"
+						style={{ color: '#001F3F' }}
+					/>
+				</div>
+				<div>
+					<label htmlFor="password" className="block text-sm font-medium">
+						Password:
+					</label>
+					<input
+						type="password"
+						id="password"
+						name="password"
+						value={formData.password}
+						onChange={handleInputChange}
+						required
+						className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937]"
+						style={{ color: '#001F3F' }}
+					/>
+				</div>
+				<button
+					type="submit"
+					className="btn-submit w-full py-2 px-4 text-white font-semibold rounded-md shadow-md focus:outline-none focus:ring-[#1f2937] focus:border-[#1f2937]">
+					Login
+				</button>
+				<Link href="/signup">
+					<p className="w-full mt-3 text-center text-gray-500">
+						Don’t have an account?{" "}
+						<span className="underline-decoration font-medium cursor-pointer hover:text-[#1f2937]">
+							Sign up here
+						</span>
+					</p>
+				</Link>
+			</form>
+		</div>
+		</>
+	);
 };
 
 export default Login;
