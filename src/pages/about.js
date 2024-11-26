@@ -32,6 +32,7 @@ const AboutPage = () => {
                         >
                             rahimkhadimhussain219@gmail.com
                         </Link>.
+						
                     </p>
                 </section>
 

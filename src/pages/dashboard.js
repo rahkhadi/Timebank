@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import Pagination from "@/components/Pagination"; // Import the Pagination component
+import Pagination from "@/components/Pagination";
 import styles from "../styles/Dashboard.module.css";
 
 const Dashboard = () => {
@@ -21,7 +21,10 @@ const Dashboard = () => {
     const fetchNotifications = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) return;
+        if (!token) {
+          setError("User is not authenticated");
+          return;
+        }
 
         const response = await axios.get("/api/notifications", {
           headers: { Authorization: `Bearer ${token}` },
