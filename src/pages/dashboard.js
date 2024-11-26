@@ -117,26 +117,9 @@ const Dashboard = () => {
         <p>Manage community requests and notifications.</p>
       </div>
 
-      {/* Notifications Section */}
-      <div className={styles.notificationsSection}>
-        <h2>Notifications</h2>
-        {notifications.length > 0 ? (
-          notifications.map((notification) => (
-            <div key={notification._id} className={styles.notification}>
-              <p>{notification.message}</p>
-            </div>
-          ))
-        ) : (
-          <p>No notifications available.</p>
-        )}
-      </div>
+    
 
-      {/* Actions Section */}
-      <div className={styles.dashboardActions}>
-        <button className={styles.createRequestButton} onClick={handleCreateRequestClick}>
-          + Create Request
-        </button>
-      </div>
+    
 
       {/* Filters and Sorting */}
       <div className={styles.filters}>

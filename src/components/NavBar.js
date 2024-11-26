@@ -11,6 +11,9 @@ import {
   faHistory,
   faBell,
   faComments,
+  faSquarePlus,
+  faTicketAlt,
+  faList,
 } from "@fortawesome/free-solid-svg-icons";
 
 import Image from "next/image";
@@ -81,39 +84,40 @@ const NavBar = () => {
               className={`${styles.navLink} ${
                 router.pathname === "/dashboard" ? styles.activeLink : ""
               }`}
+              title="Dashboard"
             >
-              Dashboard
+              <FontAwesomeIcon icon={faTicketAlt} />
+
             </span>
           </Link>
+
           <Link href="/create-request" passHref>
-            <span
-              className={`${styles.navLink} ${
-                router.pathname === "/create-request" ? styles.activeLink : ""
-              }`}
-            >
-              Create Request
-            </span>
-          </Link>
+                <span
+                  className={`${styles.authLink} ${
+                    router.pathname === "/create-request" ? styles.activeLink : ""
+                  }`}
+                  title="Create request"
+                >
+                  <FontAwesomeIcon icon={faSquarePlus} />
+               </span>
+              </Link>
+
+
+
+
+          
           <Link href="/transactions" passHref>
             <span
               className={`${styles.navLink} ${
                 router.pathname === "/transactions" ? styles.activeLink : ""
               }`}
+              title="Transaction"
             >
-              Transactions
+              <FontAwesomeIcon icon={faList} />
+
             </span>
           </Link>
-          {isLoggedIn && (
-            <Link href="/messaging" passHref>
-              <span
-                className={`${styles.navLink} ${
-                  router.pathname === "/messaging" ? styles.activeLink : ""
-                }`}
-              >
-                Messaging
-              </span>
-            </Link>
-          )}
+          
         </div>
 
         {/* Authentication and Other Actions */}
