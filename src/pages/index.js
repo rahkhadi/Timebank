@@ -22,9 +22,7 @@ const Home = () => {
                     </Link>
                 </section>
             </main>
-            <footer className={styles.footer}>
-                <p>&copy; 2024 TimeBank. All Rights Reserved.</p>
-            </footer>
+           
         </div>
     );
 };

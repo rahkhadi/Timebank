@@ -26,7 +26,7 @@ nextApp.prepare().then(() => {
 
   // Set up session management
   server.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET || '0dca6b0b5e48d58e46766e10a3225fb9f9a1723fcb68026c37d91f1203799d41',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: !dev } // Secure cookies in production

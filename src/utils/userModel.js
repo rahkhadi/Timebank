@@ -5,6 +5,7 @@ const UserSchema = new mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     username: { type: String, required: true, unique: true }, // New field for username
+    timeCoins: { type: Number, default: 3 }, // Add default TimeCoins
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
 });

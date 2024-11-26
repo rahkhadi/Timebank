@@ -1,6 +1,6 @@
-// src/pages/api/messages/get.js
 import dbConnect from "@/utils/dbConnect";
 import Message from "@/utils/messageModel";
+import mongoose from "mongoose";
 
 dbConnect();
 
@@ -8,8 +8,8 @@ export default async function handler(req, res) {
     if (req.method === "GET") {
         const { user1, user2 } = req.query;
 
-        if (!user1 || !user2) {
-            return res.status(400).json({ success: false, error: "Both user IDs are required." });
+        if (!mongoose.Types.ObjectId.isValid(user1) || !mongoose.Types.ObjectId.isValid(user2)) {
+            return res.status(400).json({ success: false, error: "Invalid user IDs." });
         }
 
         try {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
                     { sender: user1, receiver: user2 },
                     { sender: user2, receiver: user1 },
                 ],
-            }).sort({ createdAt: 1 }); // Sort messages by creation time (oldest to newest)
+            }).sort({ createdAt: 1 });
 
             res.status(200).json({ success: true, messages });
         } catch (error) {

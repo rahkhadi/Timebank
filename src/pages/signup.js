@@ -33,7 +33,7 @@ const Signup = () => {
                 setError(data.error || "Something went wrong.");
             }
         } catch (error) {
-            console.error(error);
+            console.error("Signup Error:", error);
             setError("An unexpected error occurred.");
         }
     };

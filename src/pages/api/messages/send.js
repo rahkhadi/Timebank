@@ -1,6 +1,6 @@
-// src/pages/api/messages/send.js
 import dbConnect from "@/utils/dbConnect";
 import Message from "@/utils/messageModel";
+import mongoose from "mongoose";
 
 dbConnect();
 
@@ -8,9 +8,12 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
         const { sender, receiver, content } = req.body;
 
-        // Validate required fields
-        if (!sender || !receiver || !content) {
-            return res.status(400).json({ success: false, error: "All fields are required." });
+        if (!mongoose.Types.ObjectId.isValid(sender) || !mongoose.Types.ObjectId.isValid(receiver)) {
+            return res.status(400).json({ success: false, error: "Invalid user IDs." });
+        }
+
+        if (!content) {
+            return res.status(400).json({ success: false, error: "Message content cannot be empty." });
         }
 
         try {

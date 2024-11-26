@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // Added import for useState and useEffect
 import styles from "@/styles/Messaging.module.css";
 
 function Chat({ currentUser, chatPartner }) {
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState("");
+    const [messages, setMessages] = useState([]); // Initialize state for messages
+    const [newMessage, setNewMessage] = useState(""); // Initialize state for newMessage
 
     // Fetch messages between the current user and chat partner
     useEffect(() => {
@@ -14,7 +14,7 @@ function Chat({ currentUser, chatPartner }) {
                 );
                 const data = await response.json();
                 if (data.success) {
-                    setMessages(data.messages);
+                    setMessages(data.messages); // Set the fetched messages in state
                 } else {
                     console.error(data.error);
                 }
@@ -23,7 +23,7 @@ function Chat({ currentUser, chatPartner }) {
             }
         }
         fetchMessages();
-    }, [currentUser, chatPartner]);
+    }, [currentUser, chatPartner]); // Dependencies to refetch if currentUser or chatPartner changes
 
     // Send a new message
     async function sendMessage() {
@@ -41,7 +41,7 @@ function Chat({ currentUser, chatPartner }) {
             });
             const data = await response.json();
             if (data.success) {
-                setMessages((prevMessages) => [...prevMessages, data.message]);
+                setMessages((prevMessages) => [...prevMessages, data.message]); // Add the new message to state
                 setNewMessage(""); // Clear the input field
             } else {
                 console.error(data.error);
@@ -74,12 +74,12 @@ function Chat({ currentUser, chatPartner }) {
                     className={styles.input}
                     placeholder="Type your message..."
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => setNewMessage(e.target.value)} // Update the new message on input change
                 />
                 <button
                     className={styles.button}
-                    onClick={() => sendMessage(newMessage)}
-                    disabled={!newMessage.trim()}
+                    onClick={sendMessage} // Send the message when the button is clicked
+                    disabled={!newMessage.trim()} // Disable button if input is empty
                 >
                     Send
                 </button>

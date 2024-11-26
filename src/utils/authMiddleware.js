@@ -1,19 +1,19 @@
+// utils/authMiddleware.js
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (handler) => async (req, res) => {
-	const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+	const token = req.cookies.token;
 
 	if (!token) {
-		return res.status(401).json({ error: "Unauthorized: No token provided" });
+		return res.status(401).json({ error: "Unauthorized" });
 	}
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		req.user = decoded; // Attach decoded token to the request
+		req.user = decoded;
 		return handler(req, res);
 	} catch (err) {
-		console.error("Token verification error:", err);
-		return res.status(401).json({ error: "Invalid or expired token" });
+		return res.status(401).json({ error: "Unauthorized" });
 	}
 };
 

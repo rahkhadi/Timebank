@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import Pagination from "@/components/Pagination";
 import styles from "../styles/Dashboard.module.css";
+import TimeCoins from "@/components/TimeCoins";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -140,7 +141,11 @@ const Dashboard = () => {
           </select>
         </div>
       </div>
-
+      <div>
+            <TimeCoins /> {/* Display TimeCoins */}
+            <h1>Dashboard</h1>
+            {/* Other dashboard content */}
+        </div>
       {/* Requests Section */}
       <div className={styles.contentSection}>
         {loading ? (
