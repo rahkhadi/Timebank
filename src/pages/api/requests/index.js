@@ -10,8 +10,8 @@ export default async function handler(req, res) {
         try {
             const requests = await Request.find()
                 .populate({
-                    path: 'creator',
-                    select: 'firstName lastName email',
+                    path: 'createdBy', // Correct field name
+                    select: 'firstName lastName email', // Fields to include from User
                     options: { strictPopulate: false },
                 })
                 .skip((page - 1) * limit)

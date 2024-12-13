@@ -87,26 +87,30 @@ const Dashboard = () => {
 
   const handleAcceptRequest = async (requestId) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
+        const response = await fetch("/api/requests/accept", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // Pass the token
+            },
+            body: JSON.stringify({ requestId }),
+        });
 
-      const response = await axios.post(
-        "/api/requests/accept",
-        { requestId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+        if (!response.ok) {
+            const error = await response.json();
+            alert(`Failed to accept the request: ${error.error}`);
+            return;
+        }
 
-      if (response.data.success) {
-        alert("Request accepted successfully!");
-        setRequests((prev) => prev.filter((req) => req._id !== requestId)); // Remove accepted request
-      } else {
-        throw new Error(response.data.error);
-      }
+        const data = await response.json();
+        alert(data.message);
     } catch (error) {
-      console.error("Error accepting request:", error.message);
-      alert("Failed to accept the request.");
+        console.error("Error accepting request:", error);
+        alert("Failed to accept the request.");
     }
-  };
+};
+
+
 
   const displayedRequests = applyFilterAndSort();
 
@@ -161,9 +165,9 @@ const Dashboard = () => {
                 <strong>TimeCoins:</strong> {request.timeCoins}
               </p>
               <p>
-                <strong>Created By:</strong>{" "}
-                {request.creator ? `${request.creator.firstName} ${request.creator.lastName}` : "Unknown"}
-              </p>
+    <strong>Created By:</strong> {`${request.createdBy?.firstName} ${request.createdBy?.lastName}` || "Unknown"}
+</p>
+
               {request.imageUrl && (
                 <img src={request.imageUrl} alt={request.title} className={styles.requestImage} />
               )}
