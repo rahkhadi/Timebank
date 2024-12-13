@@ -2,6 +2,7 @@ import dbConnect from '@/utils/dbConnect';
 import Request from '@/utils/requestModels';
 
 export default async function handler(req, res) {
+    console.log("API Route hit:", req.method, req.query); // Debug log
     await dbConnect();
 
     if (req.method === 'GET') {
@@ -12,7 +13,6 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Query parameter is required' });
             }
 
-            // Perform a case-insensitive search on the title field
             const requests = await Request.find({
                 title: { $regex: query, $options: 'i' },
             });

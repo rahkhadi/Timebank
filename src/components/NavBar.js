@@ -8,7 +8,6 @@ import {
   faEnvelope,
   faSignOutAlt,
   faInfoCircle,
-  faHistory,
   faBell,
   faComments,
   faSquarePlus,
@@ -19,26 +18,29 @@ import {
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
 import styles from "../styles/NavBar.module.css";
+import RequestDropdown from "./RequestDropdown";
 
 const NavBar = () => {
-  const { isLoggedIn, logout, currentUser } = useAuth(); // Added currentUser
+  const { isLoggedIn, logout, currentUser } = useAuth();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [notifications, setNotifications] = useState(0); // Number of notifications
+  const [notifications, setNotifications] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch notifications count if the user is logged in
     const fetchNotifications = async () => {
       if (isLoggedIn) {
         try {
           const response = await fetch("/api/notifications", {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`, // Use token for authenticated request
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           });
           const data = await response.json();
           if (data.success) {
-            setNotifications(data.data.length); // Update the count of notifications
+            setNotifications(data.data.length);
           }
         } catch (error) {
           console.error("Error fetching notifications:", error);
@@ -48,6 +50,37 @@ const NavBar = () => {
 
     fetchNotifications();
   }, [isLoggedIn]);
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.trim() === "") {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/requests/search?query=${query}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data);
+        setShowDropdown(true);
+      } else {
+        console.error("Failed to fetch search results");
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setSearchResults([]);
+    }
+  };
+
+  const handleResultClick = (id) => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setShowDropdown(false);
+    router.push(`/request/${id}`);
+  };
 
   const handleLogout = async () => {
     try {
@@ -77,6 +110,25 @@ const NavBar = () => {
           </Link>
         </div>
 
+        {/* Search Bar */}
+        <div className="relative w-1/2">
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="Search requests..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+          {showDropdown && searchResults.length > 0 && (
+            <div className="absolute bottom-full mb-2 w-full">
+              <RequestDropdown
+                requests={searchResults}
+                onClose={() => setShowDropdown(false)}
+              />
+            </div>
+          )}
+        </div>
+
         {/* Navigation Links */}
         <div className={styles.navLinks}>
           <Link href="/dashboard" passHref>
@@ -87,25 +139,20 @@ const NavBar = () => {
               title="Dashboard"
             >
               <FontAwesomeIcon icon={faTicketAlt} />
-
             </span>
           </Link>
 
           <Link href="/create-request" passHref>
-                <span
-                  className={`${styles.authLink} ${
-                    router.pathname === "/create-request" ? styles.activeLink : ""
-                  }`}
-                  title="Create request"
-                >
-                  <FontAwesomeIcon icon={faSquarePlus} />
-               </span>
-              </Link>
+            <span
+              className={`${styles.authLink} ${
+                router.pathname === "/create-request" ? styles.activeLink : ""
+              }`}
+              title="Create request"
+            >
+              <FontAwesomeIcon icon={faSquarePlus} />
+            </span>
+          </Link>
 
-
-
-
-          
           <Link href="/transactions" passHref>
             <span
               className={`${styles.navLink} ${
@@ -114,10 +161,8 @@ const NavBar = () => {
               title="Transaction"
             >
               <FontAwesomeIcon icon={faList} />
-
             </span>
           </Link>
-          
         </div>
 
         {/* Authentication and Other Actions */}
