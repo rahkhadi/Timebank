@@ -38,8 +38,8 @@ const Login = () => {
 	return (
 		<>
   <Head>
-        <title>PopcornBuddy - Login</title>
-        <meta name="description" content="Login to PopcornBuddy." />
+        <title>TimeBank - Login</title>
+        <meta name="description" content="Login to TimeBank." />
       </Head>
 		<div className="max-w-md mx-auto mt-16 p-8 border border-gray-300 rounded-lg bg-white shadow-md">
 			<h1 className="text-3xl font-bold text-center mb-6">Login</h1>
